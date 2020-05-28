@@ -14,10 +14,6 @@ jobs:
           shell: bash
           run: |
             touch foo && echo $BANANA
-    setup2:
-        name: Listing files
-        runs-on: ubuntu-latest
-        steps:
-        - name: ls command
+        - name: Listing files
           shell: bash
           run: ls
