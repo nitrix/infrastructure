@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+    hello:
+        image: "strm/helloworld-http"
+
+    nginx:
+        image: "nginx"
+        volumes:
+            - type: bind
+              source: ./conf/nginx.conf
+              target: /etc/nginx/nginx.conf
+              read_only: true
+            - type: bind
+              source: ./conf/ssl
+              target: /etc/nginx/ssl
+              read_only: true
+        ports:
+            - "9080:80"
+            - "9443:443"
