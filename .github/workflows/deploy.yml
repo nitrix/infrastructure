@@ -5,12 +5,19 @@ on:
             - master
 jobs:
     setup:
-        name: Setting up everything
+        name: Deploying to Docker Swarm
         runs-on: ubuntu-latest
         steps:
-        - name: Displaying the banana secret
+        - name: Writing nginx SSL keys
           env:
             BANANA: ${{ secrets.BANANA }}
-          run: |
-            echo $BANANA
           shell: bash
+          run: |
+            touch foo && echo $BANANA
+    setup2:
+        name: Listing files
+        runs-on: ubuntu-latest
+        steps:
+        - name: ls command
+          shell: bash
+          run: ls
