@@ -7,11 +7,11 @@ services:
         image: "nginx"
         volumes:
             - type: bind
-              source: ./conf/nginx.conf
+              source: conf/nginx.conf
               target: /etc/nginx/nginx.conf
               read_only: true
             - type: bind
-              source: ./conf/ssl
+              source: conf/ssl
               target: /etc/nginx/ssl
               read_only: true
         ports:
