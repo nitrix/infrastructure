@@ -18,8 +18,8 @@ jobs:
           run: |
             echo $NITRIX_ME_CRT > conf/ssl/nitrix.me.crt
             echo $NITRIX_ME_PEM > conf/ssl/nitrix.me.pem
-        
-        - name: Test connection to swarm server
+
+        - name: Updating stack
           shell: bash
           env:
             SWARM_SSH_IP: ${{ secrets.SWARM_SSH_IP }}
@@ -28,4 +28,7 @@ jobs:
           run: |
             eval `ssh-agent -s`
             echo "$SWARM_SSH_KEY" | ssh-add -
-            ssh -o StrictHostKeyChecking=no $SWARM_SSH_USER@$SWARM_SSH_IP ls
+            mkdir -p ~/.ssh
+            ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
+            rsync -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
+            ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker stack deploy -c /tmp/infrastructure/docker-compose.yml prod
