@@ -1,0 +1,16 @@
+name: deploy
+on:
+    push:
+        branches:
+            - master
+jobs:
+    setup:
+        name: Setting up everything
+        runs-on: ubuntu-latest
+        steps:
+        - name: Displaying the banana secret
+          env:
+            BANANA: ${{ secrets.BANANA }}
+          run: |
+            echo $BANANA
+          shell: bash
