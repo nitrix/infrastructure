@@ -10,18 +10,13 @@ jobs:
         steps:
         - uses: actions/checkout@v2
         
-        - name: Listing files
-          shell: bash
-          run: |
-            ls -al .
-        
         - name: Writing secrets to files
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
           shell: bash
           run: |
-            echo $NITRIX_ME_CRT > conf/ssl/nitrix.me.crt &&
+            echo $NITRIX_ME_CRT > conf/ssl/nitrix.me.crt
             echo $NITRIX_ME_PEM > conf/ssl/nitrix.me.pem
         
         - name: Test connection to swarm server
@@ -31,5 +26,6 @@ jobs:
             SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
             SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
           run: |
-            echo $SWARM_SSH_KEY > .github/key &&
-            ssh -i .github/key $SWARM_SSH_USER@$SWARM_SSH_IP whoami
+            eval `ssh-agent -s`
+            echo "$SWARM_SSH_KEY" | ssh-add -
+            ssh -o StrictHostKeyChecking=no $SWARM_SSH_USER@$SWARM_SSH_IP ls
