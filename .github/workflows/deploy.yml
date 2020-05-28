@@ -7,10 +7,14 @@ jobs:
     setup:
         name: Deploying to Docker Swarm
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: .
         steps:
+        - uses: actions/checkout@v2
+        
+        - name: Listing files
+          shell: bash
+          run: |
+            ls -al .
+        
         - name: Writing secrets to files
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
@@ -19,6 +23,7 @@ jobs:
           run: |
             echo $NITRIX_ME_CRT > conf/ssl/nitrix.me.crt &&
             echo $NITRIX_ME_PEM > conf/ssl/nitrix.me.pem
+        
         - name: Test connection to swarm server
           shell: bash
           env:
