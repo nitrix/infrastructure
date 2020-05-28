@@ -2,6 +2,8 @@ version: '3.3'
 services:
     hello:
         image: "strm/helloworld-http"
+        deploy:
+            replicas: 2
 
     nginx:
         image: "nginx"
