@@ -5,12 +5,12 @@ on:
             - master
 jobs:
     setup:
-        name: Deploying to Docker Swarm
+        name: Deploying the infrastructure
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
         
-        - name: Writing secrets to files
+        - name: Resolving secrets into files
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
