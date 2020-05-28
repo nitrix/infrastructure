@@ -10,16 +10,16 @@ jobs:
         steps:
         - uses: actions/checkout@v2
         
-        - name: Resolving secrets into files
+        - name: Obtaining SSL certificates
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
           shell: bash
           run: |
-            echo $NITRIX_ME_CRT > conf/ssl/nitrix.me.crt
-            echo $NITRIX_ME_PEM > conf/ssl/nitrix.me.pem
+            echo $NITRIX_ME_CRT > conf/nginx/ssl/nitrix.me.crt
+            echo $NITRIX_ME_PEM > conf/nginx/ssl/nitrix.me.pem
 
-        - name: Updating stack
+        - name: Updating prod stack
           shell: bash
           env:
             SWARM_SSH_IP: ${{ secrets.SWARM_SSH_IP }}
