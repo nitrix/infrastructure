@@ -7,6 +7,9 @@ jobs:
     setup:
         name: Deploying to Docker Swarm
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: .
         steps:
         - name: Writing secrets to files
           env:
