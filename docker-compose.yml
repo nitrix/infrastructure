@@ -22,5 +22,5 @@ services:
               target: /etc/nginx/ssl
               read_only: true
         ports:
-            - "9080:80"
-            - "9443:443"
+            - "80:80"
+            - "443:443"
