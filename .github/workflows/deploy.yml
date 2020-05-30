@@ -9,10 +9,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
-                    
-        - name: Preparing scripts for later
-          run: |
-            go version
             
         - name: Obtaining SSL certificates
           env:
