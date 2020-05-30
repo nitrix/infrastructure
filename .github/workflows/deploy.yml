@@ -9,19 +9,22 @@ jobs:
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
-        
+                    
+        - name: Preparing scripts for later
+          run: |
+            sed -i 's/\x0D$//' armorify.sh
+            chmod +x armorify.sh
+            
         - name: Obtaining SSL certificates
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
           run: |
             echo $NITRIX_ME_CRT > conf/nginx/ssl/nitrix.me.crt
-            echo $NITRIX_ME_PEM > conf/nginx/ssl/nitrix.me.pem
+            ./armorify.sh conf/nginx/ssl/nitrix.me.crt
             
-        - name: Preparing deploy script for later
-          run: |
-            sed -i 's/\x0D$//' deploy.sh
-            chmod +x deploy.sh
+            echo $NITRIX_ME_PEM > conf/nginx/ssl/nitrix.me.pem
+            ./armorify.sh conf/nginx/ssl/nitrix.me.pem
 
         - name: Sending files and running the deploy script remotely
           env:
@@ -34,4 +37,4 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
             rsync --exclude .git --inplace -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
-            ssh $SWARM_SSH_USER@$SWARM_SSH_IP cd /tmp/infrastructure && ./deploy.sh
+            ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker stack deploy --prune -c docker-compose.yml prod && docker ps -q -f name=prod_nginx | xargs -I % docker exec % nginx -s reload
