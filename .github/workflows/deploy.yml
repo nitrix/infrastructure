@@ -30,5 +30,5 @@ jobs:
             echo "$SWARM_SSH_KEY" | ssh-add -
             mkdir -p ~/.ssh
             ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
-            rsync -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
+            rsync --inplace -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
             ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker stack deploy --prune -c /tmp/infrastructure/docker-compose.yml prod
