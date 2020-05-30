@@ -19,12 +19,14 @@ func main() {
 	s := bufio.NewScanner(file)
 	s.Split(bufio.ScanWords)
 	i := 0
+	inside := false
 
 	for s.Scan() {
 		word := s.Text()
 		i++
 
 		if strings.HasPrefix(word, "-----") {
+			inside = true
 			if i != 1 {
 				output.WriteString("\n")
 			}
@@ -34,11 +36,15 @@ func main() {
 		}
 
 		if strings.HasSuffix(word, "-----") {
-			output.WriteString(word + " \n")
+			inside = false
+			output.WriteString(word + "\n")
 			continue
 		}
 
 		output.WriteString(word)
+		if inside {
+			output.WriteString(" ")
+		}
 	}
 
 	err = file.Close()
