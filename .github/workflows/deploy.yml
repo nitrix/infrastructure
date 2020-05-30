@@ -14,13 +14,16 @@ jobs:
           env:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
-          shell: bash
           run: |
             echo $NITRIX_ME_CRT > conf/nginx/ssl/nitrix.me.crt
             echo $NITRIX_ME_PEM > conf/nginx/ssl/nitrix.me.pem
+            
+        - name: Preparing deploy script for later
+          run: |
+            sed -i 's/\x0D$//' deploy.sh
+            chmod +x deploy.sh
 
-        - name: Updating prod stack
-          shell: bash
+        - name: Sending files and running the deploy script remotely
           env:
             SWARM_SSH_IP: ${{ secrets.SWARM_SSH_IP }}
             SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
@@ -31,5 +34,4 @@ jobs:
             mkdir -p ~/.ssh
             ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
             rsync --exclude .git --inplace -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
-            ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker stack deploy --prune -c /tmp/infrastructure/docker-compose.yml prod
-            ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker ps -q -f name=prod_nginx | xargs -I % docker exec % nginx -s reload
+            ssh $SWARM_SSH_USER@$SWARM_SSH_IP cd /tmp/infrastructure && ./deploy.sh
