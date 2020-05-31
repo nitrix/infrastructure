@@ -15,11 +15,15 @@ jobs:
             NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
             NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
           run: |
-            echo $NITRIX_ME_CRT > conf/nginx/ssl/nitrix.me.crt
-            go run armorify.go conf/nginx/ssl/nitrix.me.crt
+            cd conf/nginx/ssl
             
-            echo $NITRIX_ME_PEM > conf/nginx/ssl/nitrix.me.pem
-            go run armorify.go conf/nginx/ssl/nitrix.me.pem
+            echo $NITRIX_ME_CRT > nitrix.me.crt
+            echo $NITRIX_ME_PEM > nitrix.me.pem
+            go run ../../../armorify.go nitrix.me.crt
+            go run ../../../armorify.go nitrix.me.pem
+            
+            cp nitrix.me.crt tracker.nitrix.me.crt
+            cp nitrix.me.pem tracker.nitrix.me.pem
 
         - name: Sending files and running the deploy script remotely
           env:

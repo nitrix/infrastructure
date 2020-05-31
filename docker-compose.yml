@@ -1,4 +1,5 @@
 version: '3.3'
+
 services:
     hello:
         image: "crccheck/hello-world"
@@ -24,3 +25,18 @@ services:
         ports:
             - "80:80"
             - "443:443"
+
+    znc:
+        image: "linuxserver/znc"
+        volumes:
+            - /home/znc:/config
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.hostname == s1
+        ports:
+            - 7000:6501
+
+    tracker:
+        image: "lednerb/opentracker-docker"
