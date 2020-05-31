@@ -6,14 +6,17 @@ on:
 jobs:
     setup:
         name: Deploying the infrastructure
+        env:
+            NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
+            NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
+            SWARM_SSH_IP: ${{ secrets.SWARM_SSH_IP }}
+            SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
+            SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v2
             
         - name: Obtaining SSL certificates
-          env:
-            NITRIX_ME_CRT: ${{ secrets.NITRIX_ME_CRT }}
-            NITRIX_ME_PEM: ${{ secrets.NITRIX_ME_PEM }}
           run: |
             cd conf/nginx/ssl
             
@@ -25,16 +28,21 @@ jobs:
             cp nitrix.me.crt tracker.nitrix.me.crt
             cp nitrix.me.pem tracker.nitrix.me.pem
 
-        - name: Sending files and running the deploy script remotely
-          env:
-            SWARM_SSH_IP: ${{ secrets.SWARM_SSH_IP }}
-            SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
-            SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
+        - name: Whitelist remote host
           run: |
-            eval `ssh-agent -s`
-            echo "$SWARM_SSH_KEY" | ssh-add -
-            mkdir -p ~/.ssh
-            ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
+            mkdir -p ~/.ssh && ssh-keyscan -t rsa $SWARM_SSH_IP >> ~/.ssh/known_hosts
+
+        - name: Sending files remotely
+          run: |
+            eval `ssh-agent -s` && echo "$SWARM_SSH_KEY" | ssh-add -
             rsync --exclude .git --inplace -r . $SWARM_SSH_USER@$SWARM_SSH_IP:/tmp/infrastructure --delete
+            
+        - name: Swarm stack deploy 
+          run: |
+            eval `ssh-agent -s` && echo "$SWARM_SSH_KEY" | ssh-add -
             ssh $SWARM_SSH_USER@$SWARM_SSH_IP docker stack deploy --prune -c /tmp/infrastructure/docker-compose.yml prod
+
+        - name: Reloading nginx config remotely
+          run: |
+            eval `ssh-agent -s` && echo "$SWARM_SSH_KEY" | ssh-add -
             ssh $SWARM_SSH_USER@$SWARM_SSH_IP "docker ps -q -f name=prod_nginx | xargs -I % docker exec % nginx -s reload"
