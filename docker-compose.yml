@@ -10,18 +10,6 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
-            
-    wiki:
-        image: "linuxserver/dokuwiki"
-        deploy:
-            replicas: 1
-            placement:
-                constraints:
-                    - node.hostname == s1
-        volumes:
-            - type: bind
-              source: /home/wiki
-              target: /config
 
     nginx:
         image: "nginx"
