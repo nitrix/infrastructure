@@ -10,6 +10,18 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+            
+    wiki:
+        image: "mazzolino/tiddlywiki"
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.hostname == s1
+        volumes:
+            - type: bind
+              source: /home/wiki
+              target: /var/lib/tiddlywiki
 
     nginx:
         image: "nginx"
@@ -23,7 +35,6 @@ services:
               target: /etc/nginx/ssl
               read_only: true
         ports:
-            - "80:80"
             - "443:443"
 
     znc:

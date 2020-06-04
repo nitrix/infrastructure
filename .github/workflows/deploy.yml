@@ -27,6 +27,9 @@ jobs:
             
             cp nitrix.me.crt tracker.nitrix.me.crt
             cp nitrix.me.pem tracker.nitrix.me.pem
+            
+            cp nitrix.me.crt wiki.nitrix.me.crt
+            cp nitrix.me.pem wiki.nitrix.me.pem
 
         - name: Whitelist remote host
           run: |
