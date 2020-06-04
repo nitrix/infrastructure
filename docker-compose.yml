@@ -12,7 +12,7 @@ services:
             retries: 5
             
     wiki:
-        image: "mazzolino/tiddlywiki"
+        image: "linuxserver/dokuwiki"
         deploy:
             replicas: 1
             placement:
@@ -21,9 +21,7 @@ services:
         volumes:
             - type: bind
               source: /home/wiki
-              target: /var/lib/tiddlywiki
-        env_file:
-            - ./conf/wiki.env
+              target: /config
 
     nginx:
         image: "nginx"
