@@ -36,6 +36,11 @@ services:
                     - node.hostname == s1
         ports:
             - 7000:6501
+            
+    senko:
+        image: "nitrix/senko"
+        env_file:
+            - ./conf/senko.env
 
     tracker:
         image: "lednerb/opentracker-docker"
