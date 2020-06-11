@@ -30,7 +30,6 @@ services:
         volumes:
             - /home/znc:/config
         deploy:
-            replicas: 1
             placement:
                 constraints:
                     - node.hostname == s1
@@ -39,6 +38,12 @@ services:
             
     senko:
         image: "nitrix/senko"
+        volumes:
+            - /home/senko:/go/config
+        deploy:
+            placement:
+                constraints:
+                    - node.hostname == s1
         env_file:
             - ./conf/senko.env
 
