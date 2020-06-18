@@ -37,7 +37,7 @@ services:
             - 7000:6501
             
     senko:
-        image: "nitrix/senko"
+        image: "nitrix/senko:v0.0.12"
         volumes:
             - /home/senko:/go/config
         deploy:
