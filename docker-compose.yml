@@ -39,7 +39,8 @@ services:
     senko:
         image: "nitrix/senko:v0.0.15"
         volumes:
-            - /home/senko:/go/config
+            - /home/senko/config:/go/config
+            - /home/senko/downloads:/go/downloads
         deploy:
             placement:
                 constraints:
