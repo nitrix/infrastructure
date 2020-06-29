@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: znc
+  labels:
+    app: znc
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: znc
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: znc
+    spec:
+      containers:
+      - name: znc
+        image: linuxserver/znc
+        ports:
+        - containerPort: 6501
+        livenessProbe:
+          tcpSocket:
+            port: 6501
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        volumeMounts:
+        - mountPath: /config
+          name: znc-config
+      volumes:
+      - name: znc-config
+        hostPath:
+          path: /home/znc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: znc
+spec:
+  selector:
+    app: znc
+  type: LoadBalancer
+  ports:
+    - port: 7000
+      targetPort: 6501
+      protocol: TCP

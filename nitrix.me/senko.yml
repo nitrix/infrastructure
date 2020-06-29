@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: senko
+  labels:
+    app: senko
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: senko
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: senko
+    spec:
+      containers:
+      - name: senko
+        image: nitrix/senko
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /go/config
+          name: senko-config
+        - mountPath: /go/downloads
+          name: senko-downloads
+        env:
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: senko
+                key: DISCORD_TOKEN
+          - name: EXTERNAL_URL_PREFIX
+            value: "https://senko.nitrix.me"
+        livenessProbe:
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          httpGet:
+            path: /downloads
+            port: 80
+      volumes:
+      - name: senko-config
+        hostPath:
+          path: /home/senko/config
+      - name: senko-downloads
+        hostPath:
+          path: /home/senko/downloads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: senko
+spec:
+  selector:
+    app: senko
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: senko
+spec:
+  tls:
+  - hosts:
+      - senko.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: senko.nitrix.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: senko
+          servicePort: 80

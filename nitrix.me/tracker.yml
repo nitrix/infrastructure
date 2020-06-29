@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker
+  labels:
+    app: tracker
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: tracker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tracker
+    spec:
+      containers:
+      - name: tracker
+        image: lednerb/opentracker-docker
+        ports:
+        - containerPort: 6969
+        livenessProbe:
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          httpGet:
+            path: /stats
+            port: 6969
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracker
+spec:
+  selector:
+    app: tracker
+  ports:
+    - port: 80
+      targetPort: 6969
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: tracker
+spec:
+  tls:
+  - hosts:
+      - tracker.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: tracker.nitrix.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: tracker
+          servicePort: 80
