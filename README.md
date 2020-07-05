@@ -1,7 +1,5 @@
 # infrastructure
 
-The infrastructure for my servers.
-
 ![](logo.png)
 
 ## License
