@@ -21,6 +21,7 @@ spec:
       containers:
       - name: senko
         image: nitrix/senko
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         volumeMounts:
@@ -29,6 +30,8 @@ spec:
         - mountPath: /go/downloads
           name: senko-downloads
         env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "config/senko-google-cloud-credentials.json"
           - name: DISCORD_TOKEN
             valueFrom:
               secretKeyRef:
