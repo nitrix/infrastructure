@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanban
+  labels:
+    app: kanban
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: kanban
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kanban
+    spec:
+      containers:
+      - name: kanban
+        image: nitrix/kanban
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /opt/data
+          name: kanban-data
+        env:
+        - name: USERNAME
+          value: "nitrix"
+        - name: PASSWORD
+          valueFrom:
+              secretKeyRef:
+                name: kanban
+                key: PASSWORD
+      volumes:
+      - name: kanban-data
+        hostPath:
+          path: /home/kanban
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanban
+spec:
+  selector:
+    app: kanban
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: kanban
+spec:
+  tls:
+  - hosts:
+      - kanban.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: kanban.nitrix.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kanban
+          servicePort: 80
