@@ -20,15 +20,25 @@ spec:
     spec:
       containers:
       - name: torrent
-        image: linuxserver/qbittorrent
+        image: linuxserver/transmission
         ports:
-        - containerPort: 8080
-        - containerPort: 6881
+        - containerPort: 9091
+        - containerPort: 51413
         volumeMounts:
           - mountPath: /config
             name: torrent-config
           - mountPath: /downloads
             name: torrent-downloads
+          - mountPath: /watch
+            name: torrent-watch
+        env:
+          - name: USER
+            value: nitrix
+          - name: PASS
+            valueFrom:
+              secretKeyRef:
+                name: torrent
+                key: PASS
       volumes:
         - name: torrent-config
           hostPath:
@@ -36,6 +46,9 @@ spec:
         - name: torrent-downloads
           hostPath:
             path: /home/torrent/downloads
+        - name: torrent-watch
+          hostPath:
+            path: /home/torrent/watch
 ---
 apiVersion: v1
 kind: Service
@@ -46,7 +59,7 @@ spec:
     app: torrent
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 9091
 ---
 apiVersion: v1
 kind: Service
@@ -59,8 +72,8 @@ spec:
     app: torrent
   type: LoadBalancer
   ports:
-    - port: 6881
-      targetPort: 6881
+    - port: 51413
+      targetPort: 51413
       protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1beta1
