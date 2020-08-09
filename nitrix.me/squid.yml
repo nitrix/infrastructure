@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squid
+  labels:
+    app: squid
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: squid
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: squid
+    spec:
+      containers:
+      - name: squid
+        image: datadog/squid
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3128
+        volumeMounts:
+        - mountPath: /etc/squid
+          name: squid-config
+      volumes:
+      - name: squid-config
+        hostPath:
+          path: /home/squid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: squid
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  selector:
+    app: squid
+  type: LoadBalancer
+  ports:
+    - port: 3128
+      targetPort: 3128
+      protocol: TCP
