@@ -25,9 +25,9 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: /go/config
+        - mountPath: /opt/senko/config
           name: senko-config
-        - mountPath: /go/downloads
+        - mountPath: /opt/senko/downloads
           name: senko-downloads
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
@@ -39,12 +39,12 @@ spec:
                 key: DISCORD_TOKEN
           - name: EXTERNAL_URL_PREFIX
             value: "https://senko.nitrix.me"
-        livenessProbe:
-          initialDelaySeconds: 2
-          periodSeconds: 5
-          httpGet:
-            path: /downloads
-            port: 80
+#        livenessProbe:
+#          initialDelaySeconds: 2
+#          periodSeconds: 5
+#          httpGet:
+#            path: /downloads
+#            port: 80
       volumes:
       - name: senko-config
         hostPath:
