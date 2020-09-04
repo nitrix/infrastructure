@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dectalk
+  labels:
+    app: dectalk
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: dectalk
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: dectalk
+    spec:
+      containers:
+      - name: dectalk
+        image: nitrix/dectalk
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          httpGet:
+            path: /
+            port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dectalk
+spec:
+  selector:
+    app: dectalk
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: dectalk
+spec:
+  tls:
+  - hosts:
+      - dectalk.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: dectalk.nitrix.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: dectalk
+          servicePort: 80
