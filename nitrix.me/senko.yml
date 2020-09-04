@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: senko
-        image: nitrix/senko:v0.0.21
+        image: nitrix/senko:v0.0.22
         imagePullPolicy: Always
         ports:
         - containerPort: 80
