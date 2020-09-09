@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: senko
-        image: nitrix/senko:v0.0.22
+        image: nitrix/senko:v0.0.23
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -35,6 +35,11 @@ spec:
               secretKeyRef:
                 name: senko
                 key: DISCORD_TOKEN
+          - name: WOLFRAM_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: senko
+                key: WOLFRAM_TOKEN
           - name: EXTERNAL_URL_PREFIX
             value: "https://senko.nitrix.me"
 #        livenessProbe:
