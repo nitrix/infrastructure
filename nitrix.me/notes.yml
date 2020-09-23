@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes
+  labels:
+    app: notes
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: notes
+  replicas: 2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: notes
+    spec:
+      containers:
+      - name: notes
+        image: nitrix/notes
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          httpGet:
+            path: /
+            port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notes
+spec:
+  selector:
+    app: notes
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: notes
+spec:
+  tls:
+  - hosts:
+      - notes.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: notes.nitrix.me
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: notes
+          servicePort: 80
