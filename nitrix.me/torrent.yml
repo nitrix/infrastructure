@@ -24,6 +24,11 @@ spec:
         ports:
         - containerPort: 9091
         - containerPort: 51413
+          name: traffic-tcp
+          protocol: TCP
+        - containerPort: 51413
+          name: traffic-udp
+          protocol: UDP
         volumeMounts:
           - mountPath: /config
             name: torrent-config
@@ -64,17 +69,28 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: torrent-through
-  annotations:
-    metallb.universe.tf/allow-shared-ip: shared
+  name: torrent-through-tcp
 spec:
   selector:
     app: torrent
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 51413
       targetPort: 51413
       protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: torrent-through-udp
+spec:
+  selector:
+    app: torrent
+  type: NodePort
+  ports:
+    - port: 51413
+      targetPort: 51413
+      protocol: UDP
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
