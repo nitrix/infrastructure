@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nitrixme
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: torrent
+  namespace: nitrixme
   labels:
     app: torrent
     tier: backend
@@ -59,6 +65,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: torrent
+  namespace: nitrixme
 spec:
   selector:
     app: torrent
@@ -70,6 +77,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: torrent-through-tcp
+  namespace: nitrixme
 spec:
   selector:
     app: torrent
@@ -83,6 +91,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: torrent-through-udp
+  namespace: nitrixme
 spec:
   selector:
     app: torrent
@@ -92,10 +101,11 @@ spec:
       targetPort: 51413
       protocol: UDP
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: torrent
+  namespace: nitrixme
 spec:
   tls:
   - hosts:
@@ -106,6 +116,9 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: torrent
-          servicePort: 80
+          service:
+            name: torrent
+            port:
+              number: 80

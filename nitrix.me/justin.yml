@@ -1,7 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nitrixme
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: justin
+  namespace: nitrixme
   labels:
     app: justin
     tier: backend
@@ -32,6 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: justin
+  namespace: nitrixme
 spec:
   selector:
     app: justin
@@ -39,10 +46,11 @@ spec:
     - port: 8080
       targetPort: 8080
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: justin
+  namespace: nitrixme
 spec:
   tls:
   - hosts:
@@ -53,6 +61,9 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: justin
-          servicePort: 8080
+          service:
+            name: justin
+            port:
+              number: 8080

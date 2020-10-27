@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nekohubcom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: www
+  namespace: nekohubcom
+  labels:
+    app: www
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: www
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: www
+    spec:
+      containers:
+        - name: www
+          image: nitrix/nekohub
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            httpGet:
+              path: /
+              port: 80
+#      imagePullSecrets:
+#        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: www
+  namespace: nekohubcom
+spec:
+  selector:
+    app: www
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: www
+  namespace: nekohubcom
+spec:
+  tls:
+    - hosts:
+        - nekohub.com
+      secretName: nekohubcom-tls
+  rules:
+    - host: nekohub.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: www
+                port:
+                  number: 80

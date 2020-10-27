@@ -1,48 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nitrixme
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hello
+  name: www
+  namespace: nitrixme
   labels:
-    app: hello
+    app: www
     tier: backend
-    version: v1
 spec:
   selector:
     matchLabels:
-      app: hello
+      app: www
   replicas: 2
   template:
     metadata:
       labels:
-        app: hello
+        app: www
     spec:
       containers:
-      - name: hello
-        image: strm/helloworld-http
+      - name: www
+        image: nitrix/nitrixme
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         livenessProbe:
           initialDelaySeconds: 2
           periodSeconds: 5
           httpGet:
             path: /
-            port: 80
+            port: 8080
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello
+  name: www
+  namespace: nitrixme
 spec:
   selector:
-    app: hello
+    app: www
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: hello
+  name: www
+  namespace: nitrixme
 spec:
   tls:
   - hosts:
@@ -52,7 +59,10 @@ spec:
   - host: nitrix.me
     http:
       paths:
-      - path: /
-        backend:
-          serviceName: hello
-          servicePort: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: www
+              port:
+                number: 80
