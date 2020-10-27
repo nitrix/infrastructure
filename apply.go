@@ -13,6 +13,7 @@ type Target struct{
 }
 
 var targets = []Target{
+	{ Namespace: "default", File: "default" },
 	{ Namespace: "nitrixme", File: "nitrix.me" },
 	{ Namespace: "nekohubcom", File: "nekohub.com" },
 	{ Namespace: "ingress-nginx", File: "ingress.yml" },
