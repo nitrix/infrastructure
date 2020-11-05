@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: kanban
-        image: nitrix/kanban
+        image: nitrix/kanban:v0.0.1
         ports:
         - containerPort: 80
         volumeMounts:
@@ -38,6 +38,8 @@ spec:
               secretKeyRef:
                 name: kanban
                 key: PASSWORD
+        - name: FEATURE_STAY_LOGGED
+          value: "true"
       volumes:
       - name: kanban-data
         hostPath:
