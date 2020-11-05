@@ -4,11 +4,7 @@
 
 ## Usage
 
-To deploy everything, use:
-
-```
-kubectl apply --all --recursive -f .
-```
+To deploy everything, run `go run apply.go` or click the `Apply` shorcut. Both requires kubectl installed and configured.
 
 ## License
 
