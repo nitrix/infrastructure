@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nitrixme
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft
+  namespace: nitrixme
+  labels:
+    app: minecraft
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: minecraft
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      containers:
+      - name: minecraft
+        image: webhippie/minecraft-forge:14.23.5
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 25565
+          name: minecraft-tcp
+          protocol: TCP
+        - containerPort: 8123
+          name: minecraft-map
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /var/lib/minecraft
+          name: data
+        - mountPath: /usr/share/minecraft/mods
+          name: mods
+      volumes:
+      - name: data
+        hostPath:
+          path: /home/minecraft
+      - name: mods
+        hostPath:
+          path: /home/minecraft/mods
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-tcp
+  namespace: nitrixme
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  selector:
+    app: minecraft
+  type: LoadBalancer
+  ports:
+    - port: 25565
+      targetPort: 25565
+      protocol: TCP
+      name: minecraft-tcp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-map
+  namespace: nitrixme
+spec:
+  selector:
+    app: minecraft
+  ports:
+    - port: 8123
+      targetPort: 8123
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minecraft
+  namespace: nitrixme
+spec:
+  tls:
+  - hosts:
+      - map-minecraft.nitrix.me
+    secretName: nitrixme-tls
+  rules:
+  - host: map-minecraft.nitrix.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minecraft-map
+            port:
+              number: 8123

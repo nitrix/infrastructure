@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nitrixme
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stationeers
+  namespace: nitrixme
+  labels:
+    app: stationeers
+    tier: backend
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: stationeers
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: stationeers
+    spec:
+      containers:
+      - name: stationeers
+        image: didstopia/stationeers-server
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 27500
+          name: stationeers-u1
+          protocol: UDP
+        - containerPort: 27015
+          name: stationeers-u2
+          protocol: UDP
+        volumeMounts:
+        - mountPath: /steamcmd/stationeers
+          name: data
+        env:
+          - name: STATIONEERS_SERVER_NAME
+            value: "nitrix.me"
+          - name: STATIONEERS_SERVER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: stationeers
+                key: STATIONEERS_SERVER_PASSWORD
+      volumes:
+      - name: data
+        hostPath:
+          path: /home/stationeers
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stationeers-u1
+  namespace: nitrixme
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  selector:
+    app: stationeers
+  type: LoadBalancer
+  ports:
+    - port: 27500
+      targetPort: 27500
+      protocol: UDP
+      name: stationeers-u1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stationeers-u2
+  namespace: nitrixme
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+spec:
+  selector:
+    app: stationeers
+  type: LoadBalancer
+  ports:
+    - port: 27015
+      targetPort: 27015
+      protocol: UDP
+      name: stationeers-u2
