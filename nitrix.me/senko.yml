@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: senko
-        image: nitrix/senko
+        image: nitrix/senko:v0.0.27
         ports:
         - containerPort: 80
         volumeMounts:
