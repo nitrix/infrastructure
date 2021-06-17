@@ -1,0 +1,11 @@
+[package]
+name = "infrastructure"
+version = "0.1.0"
+authors = ["Alex Belanger <nitrix@nitrix.me>"]
+edition = "2018"
+
+[dependencies]
+
+[[bin]]
+name = "deploy"
+path = "deploy.rs"

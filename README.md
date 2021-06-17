@@ -4,7 +4,7 @@
 
 ## Usage
 
-To deploy everything, run `go run apply.go` or click the `Apply` shorcut. Both requires kubectl installed and configured.
+To deploy everything, run `cargo run`. It requires kubectl installed and configured.
 
 ## License
 

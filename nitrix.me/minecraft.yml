@@ -33,6 +33,8 @@ spec:
           name: minecraft-tcp
           protocol: TCP
         env:
+        - name: VERSION
+          value: "1.16.5"
         - name: EULA
           value: "TRUE"
         volumeMounts:
